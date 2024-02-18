@@ -176,3 +176,200 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
 
+function insurance_policy_init() {
+    $labels = array(
+        'name' => 'Insurance Policy',
+        'singular_name' => 'Insurance',
+        'add_new' => 'Add New Policy',
+        'add_new_item' => 'Add New Policy',
+        'edit_item' => 'Edit Policy',
+        'new_item' => 'New Policy',
+        'all_items' => 'All Policies',
+        'view_item' => 'View Policy',
+        'search_items' => 'Search Policies',
+        'not_found' =>  'No Policy Found',
+        'not_found_in_trash' => 'No Policy found in Trash', 
+        'parent_item_colon' => '',
+        'menu_name' => 'Insurance Policies',
+    );
+    
+    // register post type
+    $args = array(
+        'labels' => $labels,
+        'public' => true,
+        'has_archive' => true,
+        'show_ui' => true,
+        'capability_type' => 'post',
+        'hierarchical' => false,
+        'rewrite' => array('slug' => 'insurance-policy'),
+        'query_var' => true,
+        'menu_icon' => 'dashicons-admin-site',
+		'show_in_rest' => true,
+		'rest_base' => 'insurance-policy',
+		'rest_controller_class' => 'WP_REST_Posts_Controller',
+        'supports' => array(
+            'title'
+        )
+    );
+    register_post_type( 'insurance-policy', $args );
+    
+    // register taxonomy
+    register_taxonomy(
+        'insurance-policy-category', 
+        'insurance-policy', 
+        array(
+            'hierarchical' => true, 
+            'label' => 'Insurance Policy Category', 
+            'query_var' => true, 
+            'rewrite' => array( 'slug' => 'insurance-policy-category' )
+        )
+    );
+}
+add_action( 'init', 'insurance_policy_init' );
+
+function insurance_policy_meta( ) {
+	global $wp_meta_boxes;
+	add_meta_box('policy-details', 'Policy Details', 'policy_details', 'insurance-policy', 'normal', 'high');
+}
+add_action( 'add_meta_boxes_insurance-policy', 'insurance_policy_meta' );
+
+function policy_details()
+{
+	global $post;
+	$custom = get_post_custom($post->ID);
+	$policy_id = isset($custom["policy_id"][0])?$custom["policy_id"][0]:'';
+	$live_date = isset($custom["live_date"][0])?$custom["live_date"][0]:'';
+	$description = isset($custom["description"][0])?$custom["description"][0]:'';
+?>
+	<div class="form-group">
+		<label>Policy ID : </label><input name="policy_id" type="number" value="<?php echo $policy_id; ?>" required>
+	</div><br>
+	<div class="form-group">
+		<label>Live Date : </label><input name="live_date" type="date" value="<?php echo $live_date; ?>" required>
+	</div><br>
+	<div class="form-group">
+		<label for="description">Description:</label>
+		<textarea class="form-control" name="description" id="description"><?php echo $description; ?></textarea>
+	</div>
+<?php
+}
+
+function change_default_title( $title ){
+	$screen = get_current_screen();
+	if  ( 'insurance-policy' == $screen->post_type ) {
+		 $title = 'Enter Policy Name';
+	}
+	if  ( 'insurance-claim' == $screen->post_type ) {
+		 $title = 'Enter Name';
+	}
+	return $title;
+}
+add_filter( 'enter_title_here', 'change_default_title' );
+
+function insurance_policy_save_post()
+{
+    if(empty($_POST)) return; //why is insurance_policy_save_post triggered by add new? 
+    global $post;
+    update_post_meta($post->ID, "policy_id", $_POST["policy_id"]);
+    update_post_meta($post->ID, "live_date", $_POST["live_date"]);
+    update_post_meta($post->ID, "description", $_POST["description"]);
+}   
+
+add_action( 'save_post_insurance-policy', 'insurance_policy_save_post' );
+
+// Load custom scripts
+function load_custom_scripts() {
+	
+	if ( 'insurance-policy' == get_post_type() ) {
+		wp_enqueue_script( 'admin_scripts', get_template_directory_uri() . '/assets/js/custom-insurance.js', array( 'jquery' ) );
+	}
+
+	if ( 'insurance-claim' == get_post_type() ) {
+		wp_enqueue_script( 'admin_scripts', get_template_directory_uri() . '/assets/js/custom-claim.js', array( 'jquery' ) );
+	}
+
+}
+add_action( 'admin_enqueue_scripts', 'load_custom_scripts' );
+
+function insurance_claim_init() {
+    $labels = array(
+        'name' => 'Insurance Claim',
+        'singular_name' => 'Insurance',
+        'add_new' => 'Add New Claim',
+        'add_new_item' => 'Add New Claim',
+        'edit_item' => 'Edit Claim',
+        'new_item' => 'New Claim',
+        'all_items' => 'All Claims',
+        'view_item' => 'View Claim',
+        'search_items' => 'Search Claims',
+        'not_found' =>  'No Claims Found',
+        'not_found_in_trash' => 'No Claims found in Trash', 
+        'parent_item_colon' => '',
+        'menu_name' => 'Insurance Claims',
+    );
+    
+    // register post type
+    $args = array(
+        'labels' => $labels,
+        'public' => true,
+        'has_archive' => true,
+        'show_ui' => true,
+        'capability_type' => 'post',
+        'hierarchical' => false,
+        'rewrite' => array('slug' => 'insurance-claim'),
+        'query_var' => true,
+        'menu_icon' => 'dashicons-admin-site',
+		'show_in_rest' => true,
+		'rest_base' => 'insurance-claim',
+		'rest_controller_class' => 'WP_REST_Posts_Controller',
+        'supports' => array(
+            'title'
+        )
+    );
+    register_post_type( 'insurance-claim', $args );
+    
+    // register taxonomy
+    register_taxonomy(
+        'insurance-claim-category', 
+        'insurance-claim', 
+        array(
+            'hierarchical' => true, 
+            'label' => 'Insurance Claim Category', 
+            'query_var' => true, 
+            'rewrite' => array( 'slug' => 'insurance-claim-category' )
+        )
+    );
+}
+add_action( 'init', 'insurance_claim_init' );
+
+function insurance_claim_meta() {
+	global $wp_meta_boxes;
+	add_meta_box('claim-details', 'Claim Details', 'claim_details', 'insurance-claim', 'normal', 'high');
+}
+add_action( 'add_meta_boxes_insurance-claim', 'insurance_claim_meta' );
+
+function claim_details()
+{
+	global $post;
+	$custom = get_post_custom($post->ID);
+	$policy_id = isset($custom["policy_id"][0])?$custom["policy_id"][0]:'';
+	$email = isset($custom["email"][0])?$custom["email"][0]:'';
+?>
+	<div class="form-group">
+		<label>Policy ID : </label><input name="policy_id" type="number" value="<?php echo $policy_id; ?>" required>
+	</div><br>
+	<div class="form-group">
+		<label>Email : </label><input name="email" type="email" value="<?php echo $email; ?>" required>
+	</div>
+<?php
+}
+
+function insurance_claim_save_post()
+{
+    if(empty($_POST)) return; //why is insurance_policy_save_post triggered by add new? 
+    global $post;
+    update_post_meta($post->ID, "policy_id", $_POST["policy_id"]);
+    update_post_meta($post->ID, "email", $_POST["email"]);
+}   
+
+add_action( 'save_post_insurance-claim', 'insurance_claim_save_post' );
