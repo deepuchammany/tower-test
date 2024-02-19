@@ -178,8 +178,8 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 
 function insurance_policy_init() {
     $labels = array(
-        'name' => 'Insurance Policy',
-        'singular_name' => 'Insurance',
+        'name' => 'Policy',
+        'singular_name' => 'Policy',
         'add_new' => 'Add New Policy',
         'add_new_item' => 'Add New Policy',
         'edit_item' => 'Edit Policy',
@@ -197,6 +197,7 @@ function insurance_policy_init() {
     $args = array(
         'labels' => $labels,
         'public' => true,
+		'publicly_queryable' => true,
         'has_archive' => true,
         'show_ui' => true,
         'capability_type' => 'post',
@@ -312,6 +313,7 @@ function insurance_claim_init() {
     $args = array(
         'labels' => $labels,
         'public' => true,
+		'publicly_queryable' => true,
         'has_archive' => true,
         'show_ui' => true,
         'capability_type' => 'post',
