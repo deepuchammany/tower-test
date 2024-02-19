@@ -178,8 +178,8 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 
 function insurance_policy_init() {
     $labels = array(
-        'name' => 'Policy',
-        'singular_name' => 'Policy',
+        'name' => 'Insurance Policies',
+        'singular_name' => 'Insurance Policy',
         'add_new' => 'Add New Policy',
         'add_new_item' => 'Add New Policy',
         'edit_item' => 'Edit Policy',
@@ -228,12 +228,14 @@ function insurance_policy_init() {
 }
 add_action( 'init', 'insurance_policy_init' );
 
+//Add Meta fields
 function insurance_policy_meta( ) {
 	global $wp_meta_boxes;
 	add_meta_box('policy-details', 'Policy Details', 'policy_details', 'insurance-policy', 'normal', 'high');
 }
 add_action( 'add_meta_boxes_insurance-policy', 'insurance_policy_meta' );
 
+//Add Addtional fields
 function policy_details()
 {
 	global $post;
@@ -294,8 +296,8 @@ add_action( 'admin_enqueue_scripts', 'load_custom_scripts' );
 
 function insurance_claim_init() {
     $labels = array(
-        'name' => 'Insurance Claim',
-        'singular_name' => 'Insurance',
+        'name' => 'Insurance Claims',
+        'singular_name' => 'Insurance Claim',
         'add_new' => 'Add New Claim',
         'add_new_item' => 'Add New Claim',
         'edit_item' => 'Edit Claim',
@@ -344,12 +346,14 @@ function insurance_claim_init() {
 }
 add_action( 'init', 'insurance_claim_init' );
 
+//Add Meta fields
 function insurance_claim_meta() {
 	global $wp_meta_boxes;
 	add_meta_box('claim-details', 'Claim Details', 'claim_details', 'insurance-claim', 'normal', 'high');
 }
 add_action( 'add_meta_boxes_insurance-claim', 'insurance_claim_meta' );
 
+//Add Addtional fields
 function claim_details()
 {
 	global $post;
@@ -375,3 +379,23 @@ function insurance_claim_save_post()
 }   
 
 add_action( 'save_post_insurance-claim', 'insurance_claim_save_post' );
+
+add_action( 'rest_api_init', 'create_api_posts_meta_field' );
+
+function create_api_posts_meta_field() {
+
+    // register_rest_field ( 'name-of-post-type', 'name-of-field-to-return', array-of-callbacks-and-schema() )
+	register_rest_field( 'insurance-claim','custom',array(
+			'get_callback'    => 'get_post_meta_for_api',
+			'schema'          => null,
+		)
+	);
+}
+
+function get_post_meta_for_api( $object ) {
+    //get the id of the post object array
+    $post_id = $object['id'];
+
+    //return the post meta
+    return get_post_meta( $post_id );
+}

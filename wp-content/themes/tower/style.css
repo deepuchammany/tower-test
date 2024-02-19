@@ -12,3 +12,11 @@ License URI: LICENSE
 Text Domain: tower
 Tags: custom-background, custom-logo, custom-menu, featured-images, threaded-comments, translation-ready
 */
+
+.site-footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
+  }
